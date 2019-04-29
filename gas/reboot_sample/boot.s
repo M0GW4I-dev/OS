@@ -2,8 +2,7 @@
 .global init
 
 init:
-    cli
-    hlt
+    ljmpw $0xFFFF, $0 # far jump
     jmp init
 
 .fill 510 - (. - init), 1, 0
