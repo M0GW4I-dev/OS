@@ -27,8 +27,11 @@ BS_VolLab:	    .ascii	"MyOS       "
 BS_FilSysType:	.ascii	"FAT12   "
 
 start:
-  mov $msg, %si
-  hlt
+	cli
+	/* $ をつけないとそのファイル内での位置が入れられてしまうので注意する */
+	mov $msg, %si
+	call print
+	hlt
 
 /* function print: print string, set ptr of stringz to %si */
 print:
