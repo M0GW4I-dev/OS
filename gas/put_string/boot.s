@@ -26,8 +26,22 @@ BS_VolID:	    .int	0x20190502
 BS_VolLab:	    .ascii	"MyOS       "
 BS_FilSysType:	.ascii	"FAT12   "
 
-start:
+/* Initialize segment register */
+initial_register:
 	cli
+	xor %ax, %ax
+	mov %ax, %ds
+	mov %ax, %es
+	mov %ax, %fs
+	mov %ax, %gs
+	xor %bx, %bx
+	xor %cx, %cx
+	xor %dx, %dx
+	mov %ax, %ss
+	mov $0xfffc, %sp
+	jmp start
+
+start:
 	/* $ をつけないとそのファイル内での位置が入れられてしまうので注意する */
 	mov $msg, %si
 	call print
