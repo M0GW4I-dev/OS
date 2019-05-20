@@ -43,16 +43,48 @@ initial_register:
 
 start:
 	/* フロッピードライブの初期化 */
-	call	reset_floppy_drive 
-	mov $2000, %ax
-	call	read_sectors
-	/* $ をつけないとそのファイル内での位置が入れられてしまうので注意する */
-	mov $msg, %si
+	mov $0x00, %ah # モード
+	mov $0x00, %dl # ドライブ番号 */
+	int $0x13
+	jnc _next # carry flag が 0 だったら成功
+	xor %cx, %cx
+	mov %ah, %cl
+	/* buf のアドレス計算 */
+	mov buf, %ax
+	inc %ax
+	inc %ax
+	inc %ax
+	inc %ax
+	mov %ax, %dx
+	mov %cx, %ax
+	/* 左から 5 桁目の計算 */
+	mov $0x0a, %bl
+	divb %bl
+	mov %ax, (%dx)
+	dec %dx
+	shr $0x08, %ax
+	divb %bl
+	mov %ax, (%dx)
+	dec %dx
+	shr $0x08, %ax
+	divb %bl
+	mov %ah, (%dx)
+	dec %dx
+	shr $0x08, %ax
+	divb %bl
+	mov %ah, (%dx)
+	dec %dx
+	shr $0x08, %ax
+	divb %bl
+	mov %ah, (%dx)
+	mov $buf, %si
 	call print
 _hlt:
 	hlt
-	jmp	_hlt
+	jmp _hlt
 
+buf:
+	.asciz "00000"
 
 /* function print: print string, set ptr of stringz to %si */
 print:
@@ -73,17 +105,35 @@ done:
 	ret
 /* end func */
 
+/* func: decode
+
 /* func: rest_floppy_drive */
 reset_floppy_drive:
-	push	%ax
-	push	%dx
-	mov	0x00, %ah
-	mov	0x00, %dl
+/* 成功するまでやる */
+/*
+	push %ax
+	push %dx
+	movw 0xFFFF, %ax
+	movb	0x00, %ah
+	movb	0x00, %dl
 	int	$0x13
-	jc	failure
+	jnc	_success_reset
+	test $0b, %ax
+	*/
+	
+_success_reset:
+	pop	%dx
+	pop	%ax
+
+_reset_error:
+	push %dx
+	push %ax
+	mov	$fail_msg, %si
+	call	print 
 	pop	%dx
 	pop	%ax
 	ret
+
 failure:
 	mov	$fail_msg, %si
 	call	print 
