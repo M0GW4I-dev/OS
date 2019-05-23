@@ -42,49 +42,64 @@ initial_register:
 	jmp start
 
 start:
-	/* フロッピードライブの初期化 */
-	mov $0x00, %ah # モード
-	mov $0x00, %dl # ドライブ番号 */
-	int $0x13
-	jnc _next # carry flag が 0 だったら成功
-	xor %cx, %cx
-	mov %ah, %cl
-	/* buf のアドレス計算 */
 	mov buf, %ax
-	inc %ax
-	inc %ax
-	inc %ax
-	inc %ax
-	mov %ax, %dx
-	mov %cx, %ax
-	/* 左から 5 桁目の計算 */
-	mov $0x0a, %bl
-	divb %bl
-	mov %ax, (%dx)
-	dec %dx
-	shr $0x08, %ax
-	divb %bl
-	mov %ax, (%dx)
-	dec %dx
-	shr $0x08, %ax
-	divb %bl
-	mov %ah, (%dx)
-	dec %dx
-	shr $0x08, %ax
-	divb %bl
-	mov %ah, (%dx)
-	dec %dx
-	shr $0x08, %ax
-	divb %bl
-	mov %ah, (%dx)
-	mov $buf, %si
-	call print
+	call print_ax
+	mov $buf, %ax
+	call print_ax
 _hlt:
 	hlt
 	jmp _hlt
 
 buf:
-	.asciz "00000"
+	.ascii "01234"
+
+/* print_ax: %ax(16 bit) の内容を出力する */
+/* dependency label: decode_4bit, _print_ax_buf */
+/* 更新日 2019/05/23 */
+
+print_ax:
+	push %ax
+	push %si
+	mov $_print_ax_buf, %si
+	add $0x0a, %si
+	call decode_4bit
+	shr $0x04, %ax
+	dec %si
+	call decode_4bit
+	shr $0x04, %ax
+	dec %si
+	call decode_4bit
+	shr $0x04, %ax
+	dec %si
+	call decode_4bit
+	mov $_print_ax_buf, %si
+	call print
+	pop %si
+	pop %ax
+	ret
+
+_print_ax_buf:
+	.asciz "%ax=$0x0000\n\r"
+
+/* function end */
+
+/* function decode: %axの下位 4 桁をデコードして、%siのアドレスにぶち込む */
+decode_4bit:
+	push %si
+	push %ax
+	and $0x000F, %ax
+	cmp $0x000a, %ax
+	jge _decode_4bit
+_decode_4bit_ret: # 戻って来る用のラベル
+	add $0x0030, %ax
+	movb %al, (%si)
+	pop %ax
+	pop %si
+	ret
+
+_decode_4bit: # ax が 0x000a 以上 だった
+	add $0x0007, %ax
+	jmp _decode_4bit_ret
 
 /* function print: print string, set ptr of stringz to %si */
 print:
