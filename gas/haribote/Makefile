@@ -1,6 +1,8 @@
-boot.bin: boot.s Makefile
-	i686-elf-as -o boot.o boot.s
-	i686-elf-ld --oformat binary -o boot.bin -e init -Ttext 0x7c00 boot.o
+ipl.o: boot.s Makefile
+	i686-elf-as -o ipl.o boot.s
 
-run: boot.bin
-	qemu-system-x86_64 -drive format=raw,file=boot.bin
+myos.img: ipl.o Makefile
+	i686-elf-ld -nostdlib -T myos.ld --oformat binary -o myos.img ipl.o
+
+run: myos.img
+	qemu-system-i386 -drive format=raw,file=myos.img
