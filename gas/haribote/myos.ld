@@ -3,5 +3,9 @@ ENTRY(init)
 SECTIONS
 {
 	. = 0x7c00;
-	.text : { *(.text) }
+	.boot : { 
+		ipl.o(.text);
+		. = 0xc200;
+		haribote.sys(.text);
+	}
 }

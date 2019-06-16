@@ -1,5 +1,9 @@
+
+#define DEBUG
+.set CYLS, 10
 .code16gcc
-.global init
+.global init, print
+.extern kernel
 /* start from address 0x7c00 */
 /* init ラベルがないと詰む */
 .text
@@ -35,6 +39,7 @@ entry:
     mov %ax, %ds
     mov %ax, %es
     sti
+    # ブートしたドライブの番号の退避
     movb %dl, (boot_dev)
     mov $msg, %si
 
@@ -54,15 +59,18 @@ load_sector:
     mov %ax, %es
     movb $0x00, %ch # シリンダ$0x00
     movb $0x00, %dh # ヘッド $0x00
-    movb $0x02, %cl # セクタ $0x02
+    movb $0x02, %cl # セクタ番号 $0x02 から読み始める
     movw $0x0000, %si # 失敗回数記録用
+
+readloop:
+    mov $0, %si # 失敗回数を数えるレジスタ
 retry:
     movb $0x02, %ah # ハンドラ番号 $0x02はディスク読み込み
     movb $0x01, %al # 1 セクタ
     movw $0x0000, %bx
-    movb (boot_dev), %dl # A ドライブ
+    movb (boot_dev), %dl # ドライブ番号の呼び出し
     int $0x13
-    jnc fin
+    jnc next
     addw $0x0001, %si
     cmp $0x0005, %si
     jae error
@@ -71,6 +79,32 @@ retry:
     int $0x13
     jmp retry
 
+next:
+    mov %es, %ax # アドレスを0x200(512バイト: 1 セクタ分)
+    addw $0x0020, %ax
+    mov %ax, %es
+    add $1, %cl
+    cmp $18, %cl
+    jbe readloop
+    mov $1, %cl
+    addb $1, %dh
+    cmp $2, %dh
+    jb readloop
+    mov $0, %dh
+    add $1, %ch
+    cmp $CYLS, %ch
+    jb readloop
+    
+
+    #ifdef DEBUG
+    mov $success_msg, %si
+    #endif
+    call print
+    #ifdef DEBUG
+    mov $success_msg, %si
+    #endif
+    call print
+    jmp kernel
 fin:
     hlt
     jmp fin
@@ -148,6 +182,8 @@ done:
 	ret
 /* end func */
 
+success_msg:
+    .asciz "SUCCESS\n\r"
 error_msg:
     .asciz "ERROR\n\r"
 boot_dev:
