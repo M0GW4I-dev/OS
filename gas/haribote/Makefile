@@ -1,11 +1,19 @@
-ipl.o: boot.s Makefile
-	i686-elf-as -o ipl.o boot.s
+AS = i686-elf-as
+LD = i686-elf-ld
 
-haribote.sys: haribote.s Makefile
-	i686-elf-as -o haribote.sys haribote.s
 
-myos.img: ipl.o myos.ld haribote.sys Makefile
-	i686-elf-ld -nostdlib -T myos.ld --oformat binary -o myos.img ipl.o haribote.sys
+%.bin: %.s %.ld Makefile
+	$(AS) -o $*.o $*.s
+	$(LD) -T $*.ld -o $*.bin $*.o
+
+myos.img: boot.bin haribote.bin
+	mformat -f 1440 -C -B boot.bin -i $@
+	mcopy -i $@ haribote.bin ::
 
 run: myos.img
-	qemu-system-i386 -drive format=raw,file=myos.img
+	qemu-system-i386 -drive format=raw,if=floppy,file=myos.img -monitor stdio
+
+.PHONY: clean
+
+clean:
+	rm *.img *.o *.bin

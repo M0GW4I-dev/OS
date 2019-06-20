@@ -3,7 +3,6 @@
 .set CYLS, 10
 .code16gcc
 .global init, print
-.extern kernel
 /* start from address 0x7c00 */
 /* init ラベルがないと詰む */
 .text
@@ -75,7 +74,7 @@ retry:
     cmp $0x0005, %si
     jae error
     movb $0x00, %ah
-    movb $0x00, %dl
+    movb (boot_dev), %dl
     int $0x13
     jmp retry
 
@@ -104,7 +103,7 @@ next:
     mov $success_msg, %si
     #endif
     call print
-    jmp kernel
+    jmp 0xc200
 fin:
     hlt
     jmp fin
