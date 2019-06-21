@@ -94,15 +94,8 @@ next:
     cmp $CYLS, %ch
     jb readloop
     
-
-    #ifdef DEBUG
-    mov $success_msg, %si
-    #endif
-    call print
-    #ifdef DEBUG
-    mov $success_msg, %si
-    #endif
-    call print
+    movb $CYLS, (0x0ff0)
+    
     jmp 0xc200
 fin:
     hlt

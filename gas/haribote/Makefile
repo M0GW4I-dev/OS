@@ -6,8 +6,8 @@ LD = i686-elf-ld
 	$(AS) -o $*.o $*.s
 	$(LD) -T $*.ld -o $*.bin $*.o
 
-myos.img: boot.bin haribote.bin
-	mformat -f 1440 -C -B boot.bin -i $@
+myos.img: ipl.bin haribote.bin
+	mformat -f 1440 -C -B ipl.bin -i $@
 	mcopy -i $@ haribote.bin ::
 
 run: myos.img
