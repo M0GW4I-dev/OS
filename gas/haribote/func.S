@@ -1,9 +1,15 @@
 .code32
 
-.global _io_hlt
+.global write_mem8, io_hlt
 
 .text
 
-_io_hlt: # void _io_hlt(void);
+io_hlt:
     hlt
+    jmp io_hlt
+
+write_mem8: # void write(int *addr, int data)
+    movl 4(%esp), %ecx
+    movb 8(%esp), %al
+    movb %al, (%ecx)
     ret

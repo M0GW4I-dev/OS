@@ -3,7 +3,7 @@ OUTPUT_FORMAT("binary")
 SECTIONS
 {
 	. = 0xc200;
-	.boot : {
-        haribote.o(.text);
+	.boot : { 
+		haribote.o(.text);
 	}
 }
