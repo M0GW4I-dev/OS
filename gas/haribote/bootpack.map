@@ -8,28 +8,38 @@ Linker script and memory map
 
                 0x0000000000280000                . = 0x280000
 
-.text           0x0000000000280000       0x46
+.text           0x0000000000280000      0x157
  bootpack.o(.text)
- .text          0x0000000000280000       0x38 bootpack.o
-                0x0000000000280000                Main
+ .text          0x0000000000280000      0x108 bootpack.o
+                0x0000000000280000                HariMain
+                0x000000000028003f                init_palette
+                0x000000000028005c                set_palette
  func.o(.text)
- .text          0x0000000000280038        0xe func.o
-                0x0000000000280038                io_hlt
-                0x000000000028003b                write_mem8
+ .text          0x0000000000280108       0x4f func.o
+                0x0000000000280108                io_hlt
+                0x000000000028010a                io_cli
+                0x0000000000280111                io_in8
+                0x000000000028011c                io_in16
+                0x0000000000280128                io_in32
+                0x000000000028012e                io_out8
+                0x0000000000280138                io_out16
+                0x0000000000280143                io_out32
+                0x000000000028014d                io_load_eflags
+                0x0000000000280150                io_store_eflags
 LOAD func.o
 LOAD bootpack.o
 OUTPUT(bootpack.bin binary)
 
-.eh_frame       0x0000000000280048       0x34
- .eh_frame      0x0000000000280048       0x34 bootpack.o
+.eh_frame       0x0000000000280158       0x74
+ .eh_frame      0x0000000000280158       0x74 bootpack.o
 
-.data           0x000000000028007c        0x0
- .data          0x000000000028007c        0x0 bootpack.o
- .data          0x000000000028007c        0x0 func.o
+.data           0x00000000002801e0       0x30
+ .data          0x00000000002801e0       0x30 bootpack.o
+ .data          0x0000000000280210        0x0 func.o
 
-.bss            0x000000000028007c        0x0
- .bss           0x000000000028007c        0x0 bootpack.o
- .bss           0x000000000028007c        0x0 func.o
+.bss            0x0000000000280210        0x0
+ .bss           0x0000000000280210        0x0 bootpack.o
+ .bss           0x0000000000280210        0x0 func.o
 
 .comment        0x0000000000000000       0x12
  .comment       0x0000000000000000       0x12 bootpack.o
