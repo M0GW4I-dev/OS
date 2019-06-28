@@ -8,39 +8,40 @@ Linker script and memory map
 
                 0x0000000000280000                . = 0x280000
 
-.text           0x0000000000280000      0x3cf
+.text           0x0000000000280000      0x3de
  bootpack.o(.text)
- .text          0x0000000000280000      0x380 bootpack.o
+ .text          0x0000000000280000      0x38f bootpack.o
                 0x0000000000280000                HariMain
-                0x0000000000280265                init_palette
-                0x0000000000280282                set_palette
-                0x000000000028032e                boxfill8
+                0x0000000000280057                init_palette
+                0x0000000000280074                set_palette
+                0x0000000000280120                boxfill8
+                0x0000000000280172                init_screen
  func.o(.text)
- .text          0x0000000000280380       0x4f func.o
-                0x0000000000280380                io_hlt
-                0x0000000000280382                io_cli
-                0x0000000000280389                io_in8
-                0x0000000000280394                io_in16
-                0x00000000002803a0                io_in32
-                0x00000000002803a6                io_out8
-                0x00000000002803b0                io_out16
-                0x00000000002803bb                io_out32
-                0x00000000002803c5                io_load_eflags
-                0x00000000002803c8                io_store_eflags
+ .text          0x000000000028038f       0x4f func.o
+                0x000000000028038f                io_hlt
+                0x0000000000280391                io_cli
+                0x0000000000280398                io_in8
+                0x00000000002803a3                io_in16
+                0x00000000002803af                io_in32
+                0x00000000002803b5                io_out8
+                0x00000000002803bf                io_out16
+                0x00000000002803ca                io_out32
+                0x00000000002803d4                io_load_eflags
+                0x00000000002803d7                io_store_eflags
 LOAD func.o
 LOAD bootpack.o
 OUTPUT(bootpack.bin binary)
 
-.eh_frame       0x00000000002803d0       0x94
- .eh_frame      0x00000000002803d0       0x94 bootpack.o
+.eh_frame       0x00000000002803e0       0xb8
+ .eh_frame      0x00000000002803e0       0xb8 bootpack.o
 
-.data           0x0000000000280480       0x30
- .data          0x0000000000280480       0x30 bootpack.o
- .data          0x00000000002804b0        0x0 func.o
+.data           0x00000000002804a0       0x30
+ .data          0x00000000002804a0       0x30 bootpack.o
+ .data          0x00000000002804d0        0x0 func.o
 
-.bss            0x00000000002804b0        0x0
- .bss           0x00000000002804b0        0x0 bootpack.o
- .bss           0x00000000002804b0        0x0 func.o
+.bss            0x00000000002804d0        0x0
+ .bss           0x00000000002804d0        0x0 bootpack.o
+ .bss           0x00000000002804d0        0x0 func.o
 
 .comment        0x0000000000000000       0x12
  .comment       0x0000000000000000       0x12 bootpack.o
