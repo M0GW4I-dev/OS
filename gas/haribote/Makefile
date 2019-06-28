@@ -16,9 +16,11 @@ CFLAGS = -m32 -nostdlib
 func.o: func.s
 	$(AS) $(ASFLAGS) -o $@ func.s
 
-bootpack.bin: bootpack.ld bootpack.o func.o Makefile
-	$(LD) -v $(LDFLAGS) -Map bootpack.map -T bootpack.ld -o $@ func.o bootpack.o
+bootpack.bin: bootpack.ld bootpack.o func.o font.o Makefile
+	$(LD) -v $(LDFLAGS) -Map bootpack.map -T bootpack.ld -o $@ func.o bootpack.o font.o
 
+font.c: hankaku.txt make_font.py
+	./make_font.py hankaku.txt > $@
 
 myos.img: ipl.bin bootpack.bin head.bin
 	mformat -f 1440 -C -B ipl.bin -i $@

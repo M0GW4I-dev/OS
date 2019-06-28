@@ -7,5 +7,9 @@ SECTIONS {
     .text : {
         bootpack.o(.text)
         func.o(.text)
+        *(.text)
+    }
+    .data : {
+        *(.data)
     }
 }

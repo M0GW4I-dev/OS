@@ -8,40 +8,50 @@ Linker script and memory map
 
                 0x0000000000280000                . = 0x280000
 
-.text           0x0000000000280000      0x3de
+.text           0x0000000000280000      0x5c0
  bootpack.o(.text)
- .text          0x0000000000280000      0x38f bootpack.o
+ .text          0x0000000000280000      0x571 bootpack.o
                 0x0000000000280000                HariMain
-                0x0000000000280057                init_palette
-                0x0000000000280074                set_palette
-                0x0000000000280120                boxfill8
-                0x0000000000280172                init_screen
+                0x0000000000280137                init_palette
+                0x0000000000280154                set_palette
+                0x0000000000280200                boxfill8
+                0x0000000000280252                init_screen
+                0x000000000028046f                putfont8
  func.o(.text)
- .text          0x000000000028038f       0x4f func.o
-                0x000000000028038f                io_hlt
-                0x0000000000280391                io_cli
-                0x0000000000280398                io_in8
-                0x00000000002803a3                io_in16
-                0x00000000002803af                io_in32
-                0x00000000002803b5                io_out8
-                0x00000000002803bf                io_out16
-                0x00000000002803ca                io_out32
-                0x00000000002803d4                io_load_eflags
-                0x00000000002803d7                io_store_eflags
+ .text          0x0000000000280571       0x4f func.o
+                0x0000000000280571                io_hlt
+                0x0000000000280573                io_cli
+                0x000000000028057a                io_in8
+                0x0000000000280585                io_in16
+                0x0000000000280591                io_in32
+                0x0000000000280597                io_out8
+                0x00000000002805a1                io_out16
+                0x00000000002805ac                io_out32
+                0x00000000002805b6                io_load_eflags
+                0x00000000002805b9                io_store_eflags
+ *(.text)
+ .text          0x00000000002805c0        0x0 font.o
+
+.eh_frame       0x00000000002805c0       0xd8
+ .eh_frame      0x00000000002805c0       0xd8 bootpack.o
+
+.data           0x00000000002806a0     0x1040
+ *(.data)
+ .data          0x00000000002806a0       0x30 bootpack.o
+ .data          0x00000000002806d0        0x0 func.o
+ *fill*         0x00000000002806d0       0x10 
+ .data          0x00000000002806e0     0x1000 font.o
+                0x00000000002806e0                hankaku
 LOAD func.o
 LOAD bootpack.o
+LOAD font.o
 OUTPUT(bootpack.bin binary)
 
-.eh_frame       0x00000000002803e0       0xb8
- .eh_frame      0x00000000002803e0       0xb8 bootpack.o
+.bss            0x00000000002816e0        0x0
+ .bss           0x00000000002816e0        0x0 bootpack.o
+ .bss           0x00000000002816e0        0x0 func.o
+ .bss           0x00000000002816e0        0x0 font.o
 
-.data           0x00000000002804a0       0x30
- .data          0x00000000002804a0       0x30 bootpack.o
- .data          0x00000000002804d0        0x0 func.o
-
-.bss            0x00000000002804d0        0x0
- .bss           0x00000000002804d0        0x0 bootpack.o
- .bss           0x00000000002804d0        0x0 func.o
-
-.comment        0x0000000000000000       0x12
+.comment        0x0000000000000000       0x24
  .comment       0x0000000000000000       0x12 bootpack.o
+ .comment       0x0000000000000012       0x12 font.o
