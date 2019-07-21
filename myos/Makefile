@@ -1,16 +1,16 @@
-AS = i686-elf-as
-LD = i686-elf-ld
-CC = i686-elf-gcc
-QEMU = qemu-system-i386 -format
+AS = x86_64-elf-as
+LD = x86_64-elf-ld
+CC = x86_64-elf-gcc
+QEMU = qemu-system-i386
 
 %.o: %.S
-	$(AS) -o $@ $*.S
+	$(AS) --32 -march=i386 -o $@ $*.S
 
 %.o: %.c
-	$(CC) -ffreestanding -c -o $@ $*.c
+	$(CC) -m32 -nostdlib -ffreestanding -c -o $@ $*.c
 
 myos.bin: boot.o kernel.o Makefile
-	$(CC) -T myos.ld -o $@ -ffreestanding -O2 -nostdlib boot.o kernel.o -lgcc
+	$(LD) -T myos.ld -m elf_i386 boot.o kernel.o
 
 .PHONY: clean bin_test create_img run
 
@@ -27,4 +27,4 @@ create_img: bin_test
 	i386-elf-grub-mkrescue -o myos.iso isodir
 
 run: create_img
-	$(QEMU) = qemu-system-i386 -cdrom myos.iso -monitor stdio
+	$(QEMU) -cdrom myos.iso -monitor stdio
