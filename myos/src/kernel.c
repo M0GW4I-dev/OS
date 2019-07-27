@@ -1,5 +1,7 @@
 #include "multiboot.h"
 #include "multiboot_def.h"
+#include "idt.h"
+#include "gdt.h"
 
 void displaySample(char c, unsigned char foreColor, unsigned char backColor, int x, int y);
 
@@ -10,18 +12,33 @@ void displaySample(char c, unsigned char foreColor, unsigned char backColor, int
 #define MAX_X   DEF_MBH_WIDTH
 #define MAX_XY  (MAX_X * MAX_Y)
 
-static char message[] = "Hello world!";
+static char message[] = "Megumi is so cute!";
+
+/* カーネルのエントリーポイント */
+
+extern IDTR idtr;
+extern GATE_DESCRIPTOR *idt;
+extern GDTR gdtr;
+extern SEGMENT_DESCRIPTOR *gdt;
+
 
 void kernel_main(UINT32 magic, MULTIBOOT_INFO *info)
 {
+	/* gdtの設定 */
+	setupGdt();
+	load_gdt();
+	
+	/* idtの設定 */
+	idtr.size = NUM_IDT * sizeof(GATE_DESCRIPTOR);
+	idtr.base = (GATE_DESCRIPTOR *)idt;
+	load_idt();
     int strlen;
     int i;
 
     strlen = sizeof(message);
     for(i=0; i < strlen; i++) {
-        displaySample(message[i], DEF_COLOR_WHITE, DEF_COLOR_BLACK, i, 0);
+	displaySample(message[i], DEF_COLOR_WHITE, DEF_COLOR_BLACK, i, 0);
     }
-    for(;;);
 }
 
 void displaySample(char c, unsigned char foreColor, unsigned char backColor, int x, int y)
@@ -34,3 +51,4 @@ void displaySample(char c, unsigned char foreColor, unsigned char backColor, int
     vram_TextMode += x+y*MAX_X;
     *vram_TextMode = (color << 8)|c;
 }
+
