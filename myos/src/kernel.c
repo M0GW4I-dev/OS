@@ -2,6 +2,8 @@
 #include "multiboot_def.h"
 #include "idt.h"
 #include "gdt.h"
+#include "pic.h"
+#include "timer.h"
 
 void displaySample(char c, unsigned char foreColor, unsigned char backColor, int x, int y);
 
@@ -27,11 +29,22 @@ void kernel_main(UINT32 magic, MULTIBOOT_INFO *info)
 	/* gdtの設定 */
 	setupGdt();
 	load_gdt();
+	/************/
 	
 	/* idtの設定 */
 	idtr.size = NUM_IDT * sizeof(GATE_DESCRIPTOR);
 	idtr.base = (GATE_DESCRIPTOR *)idt;
+	setupInterruptGate(0x20, (void *)timer_interrupt);
 	load_idt();
+	/************/
+
+	/* ハンドラの設定 */
+	initPic();
+	initPit();
+	/*****************/
+
+
+
     int strlen;
     int i;
 

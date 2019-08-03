@@ -14,8 +14,8 @@ GRUB_DIR = $(BOOT_DIR)/grub
 %.o: %.c
 	$(CC) -m32 -nostdlib -ffreestanding -c -o $(BIN_DIR)/$@ $*.c
 
-myos.bin: boot.o kernel.o idt.o gdt.o Makefile
-	$(LD) -o $(BIN_DIR)/myos.bin -T myos.ld -m elf_i386 $(BIN_DIR)/boot.o $(BIN_DIR)/kernel.o $(BIN_DIR)/idt.o $(BIN_DIR)/gdt.o
+myos.bin: boot.o kernel.o idt.o gdt.o int.o pic.o timer.o port.o Makefile
+	$(LD) -o $(BIN_DIR)/myos.bin -T myos.ld -m elf_i386 $(BIN_DIR)/boot.o $(BIN_DIR)/kernel.o $(BIN_DIR)/idt.o $(BIN_DIR)/gdt.o $(BIN_DIR)/int.o $(BIN_DIR)/pic.o $(BIN_DIR)/timer.o $(BIN_DIR)/port.o
 
 .PHONY: clean bin_test create_img run
 
